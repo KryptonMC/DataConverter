@@ -7,7 +7,7 @@ import ca.spottedleaf.dataconverter.types.ListType;
 import ca.spottedleaf.dataconverter.types.MapType;
 import ca.spottedleaf.dataconverter.types.ObjectType;
 import ca.spottedleaf.dataconverter.types.Types;
-import net.minecraft.util.Mth;
+import ca.spottedleaf.dataconverter.util.MathUtil;
 
 public final class V1955 {
 
@@ -24,7 +24,7 @@ public final class V1955 {
     private V1955() {}
 
     static int getMinXpPerLevel(final int level) {
-        return LEVEL_XP_THRESHOLDS[Mth.clamp(level - 1, 0, LEVEL_XP_THRESHOLDS.length - 1)];
+        return LEVEL_XP_THRESHOLDS[MathUtil.clamp(level - 1, 0, LEVEL_XP_THRESHOLDS.length - 1)];
     }
 
     static void addLevel(final MapType<String> data, final int level) {
@@ -57,7 +57,7 @@ public final class V1955 {
                         recipeCount = 0;
                     }
 
-                    level = Mth.clamp(recipeCount / 2, 1, 5);
+                    level = MathUtil.clamp(recipeCount / 2, 1, 5);
                     if (level > 1) {
                         addLevel(data, level);
                     }

@@ -10,10 +10,6 @@ import ca.spottedleaf.dataconverter.minecraft.walkers.itemstack.DataWalkerItems;
 import ca.spottedleaf.dataconverter.minecraft.walkers.generic.WalkerUtils;
 import ca.spottedleaf.dataconverter.types.ObjectType;
 import ca.spottedleaf.dataconverter.types.MapType;
-import net.minecraft.core.Registry;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.EntityBlock;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import java.util.HashMap;
@@ -158,6 +154,9 @@ public final class V704 {
 
     // This class is responsible for also integrity checking the item id to tile id map here, we just use the item registry to figure it out
 
+    // Krypton doesn't support this integrity checking, and there's no way to really do it without backend access.
+    // Also, it's not really that necessary.
+    /*
     static {
         for (final Item item : Registry.ITEM) {
             if (!(item instanceof BlockItem)) {
@@ -174,6 +173,7 @@ public final class V704 {
             }
         }
     }
+    */
 
     protected static final Map<String, String> TILE_ID_UPDATE = new HashMap<>();
     static {

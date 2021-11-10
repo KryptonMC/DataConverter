@@ -7,17 +7,9 @@ import ca.spottedleaf.dataconverter.types.MapType;
 import ca.spottedleaf.dataconverter.types.json.JsonMapType;
 import ca.spottedleaf.dataconverter.types.json.JsonTypeUtil;
 import ca.spottedleaf.dataconverter.types.nbt.NBTMapType;
+import ca.spottedleaf.dataconverter.util.Pair;
 import com.google.common.base.Splitter;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.mojang.datafixers.util.Pair;
-import com.mojang.serialization.Dynamic;
-import com.mojang.serialization.DynamicOps;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtOps;
-import net.minecraft.nbt.Tag;
-import net.minecraft.util.GsonHelper;
+import com.google.gson.JsonObject;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -25,12 +17,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.stream.Collectors;
+import org.kryptonmc.nbt.CompoundTag;
+import org.kryptonmc.nbt.ListTag;
 
 public final class V1506 {
 
     protected static final int VERSION = MCVersions.V1_13_PRE4 + 2;
 
+    private static final Splitter SETTINGS_SPLITTER = Splitter.on(';');
     static final Map<String, String> MAP = new HashMap<>();
     static {
         MAP.put("0", "minecraft:ocean");
@@ -119,101 +113,105 @@ public final class V1506 {
                 if ("flat".equalsIgnoreCase(generatorName)) {
                     data.setMap("generatorOptions", V1506.convert(generatorOptions == null ? "" : generatorOptions));
                 } else if ("buffet".equalsIgnoreCase(generatorName) && generatorOptions != null) {
-                    data.setMap("generatorOptions", JsonTypeUtil.convertJsonToNBT(new JsonMapType(GsonHelper.parse(generatorName, true), false)));
+                    final JsonMapType newGeneratorOptions = new JsonMapType(V101.GSON.fromJson(generatorName, JsonObject.class), false);
+                    data.setMap("generatorOptions", JsonTypeUtil.convertJsonToNBT(newGeneratorOptions));
                 }
                 return null;
             }
         });
     }
 
-    private static MapType<String> convert(final String param0) {
-        final Dynamic<Tag> dynamic = convert(param0, NbtOps.INSTANCE);
-
-        return new NBTMapType((CompoundTag)dynamic.getValue());
-    }
-
-    // Yeah I ain't touching that. This is basically magic value hell.
-    private static <T> Dynamic<T> convert(final String generatorSettings, final DynamicOps<T> ops) {
-        final Iterator<String> splitSettings = Splitter.on(';').split(generatorSettings).iterator();
+    private static MapType<String> convert(final String generatorSettings) {
+        final Iterator<String> splitSettings = SETTINGS_SPLITTER.split(generatorSettings).iterator();
         String biome = "minecraft:plains";
-        final Map<String, Map<String, String>> structures = Maps.newHashMap();
+        final Map<String, Map<String, String>> structures = new HashMap<>();
         final List<Pair<Integer, String>> layers;
         if (!generatorSettings.isEmpty() && splitSettings.hasNext()) {
             layers = getLayersInfoFromString(splitSettings.next());
             if (!layers.isEmpty()) {
                 // biome is next
-                if (splitSettings.hasNext()) {
-                    biome = MAP.getOrDefault(splitSettings.next(), "minecraft:plains");
-                }
+                if (splitSettings.hasNext()) biome = MAP.getOrDefault(splitSettings.next(), "minecraft:plains");
 
                 // structures is next
                 if (splitSettings.hasNext()) {
-                    final String[] structuresSplit = splitSettings.next().toLowerCase(Locale.ROOT).split(",");
-
-                    for (final String structureString : structuresSplit) {
+                    for (final String structureString : splitSettings.next().toLowerCase(Locale.ROOT).split(",")) {
                         final String[] structureInfo = structureString.split("\\(", 2);
-                        if (!structureInfo[0].isEmpty()) {
-                            structures.put(structureInfo[0], Maps.newHashMap());
-                            if (structureInfo.length > 1 && structureInfo[1].endsWith(")") && structureInfo[1].length() > 1) {
-                                // I can't even guess the mappings for these. Not worth my time, it will work regardless of the mappings
-                                final String[] var7 = structureInfo[1].substring(0, structureInfo[1].length() - 1).split(" ");
+                        if (structureInfo[0].isEmpty()) continue;
 
-                                for (final String var8 : var7) {
-                                    String[] var9 = var8.split("=", 2);
-                                    if (var9.length == 2) {
-                                        structures.get(structureInfo[0]).put(var9[0], var9[1]);
-                                    }
-                                }
+                        structures.put(structureInfo[0], new HashMap<>());
+                        if (structureInfo.length <= 1 || !structureInfo[1].endsWith(")") || structureInfo[1].length() <= 1) continue;
+
+                        for (final String element : structureInfo[0].substring(0, structureInfo[1].length() - 1).split(" ")) {
+                            final String[] var9 = element.split("=", 2);
+                            if (var9.length == 2) {
+                                final Map<String, String> structureMap = structures.get(structureInfo[0]);
+                                if (structureMap != null) structureMap.put(var9[0], var9[1]);
                             }
                         }
                     }
                 } else {
-                    structures.put("village", Maps.newHashMap());
+                    structures.put("village", new HashMap<>());
                 }
             }
         } else {
-            layers = Lists.newArrayList();
-            layers.add(Pair.of(1, "minecraft:bedrock"));
-            layers.add(Pair.of(2, "minecraft:dirt"));
-            layers.add(Pair.of(1, "minecraft:grass_block"));
-            structures.put("village", Maps.newHashMap());
+            layers = new ArrayList<>();
+            layers.add(new Pair<>(1, "minecraft:bedrock"));
+            layers.add(new Pair<>(2, "minecraft:dirt"));
+            layers.add(new Pair<>(1, "minecraft:grass_block"));
+            structures.put("village", new HashMap<>());
         }
 
-        final T layerTag = ops.createList(layers.stream().map((param1x) -> ops.createMap(ImmutableMap.of(ops.createString("height"), ops.createInt(param1x.getFirst()), ops.createString("block"), ops.createString(param1x.getSecond())))));
-        final T structuresTag = ops.createMap(structures.entrySet().stream().map((param1x) -> Pair.of(ops.createString(param1x.getKey().toLowerCase(Locale.ROOT)), ops.createMap(param1x.getValue().entrySet().stream().map((param1xx) -> Pair.of(ops.createString(param1xx.getKey()), ops.createString(param1xx.getValue()))).collect(Collectors.toMap(Pair::getFirst, Pair::getSecond))))).collect(Collectors.toMap(Pair::getFirst, Pair::getSecond)));
-        return new Dynamic<>(ops, ops.createMap(ImmutableMap.of(ops.createString("layers"), layerTag, ops.createString("biome"), ops.createString(biome), ops.createString("structures"), structuresTag)));
+        final ListTag.Builder layersBuilder = ListTag.builder();
+        for (final Pair<Integer, String> layer : layers) {
+            final CompoundTag layerTag = CompoundTag.builder()
+                    .putInt("height", layer.first())
+                    .putString("block", layer.second())
+                    .build();
+            layersBuilder.add(layerTag);
+        }
+
+        final CompoundTag.Builder structuresBuilder = CompoundTag.builder();
+        for (final Map.Entry<String, Map<String, String>> structure : structures.entrySet()) {
+            final String name = structure.getKey().toLowerCase(Locale.ROOT);
+            final CompoundTag.Builder structureBuilder = CompoundTag.builder();
+            for (final Map.Entry<String, String> entry : structure.getValue().entrySet()) {
+                structureBuilder.putString(entry.getKey(), entry.getValue());
+            }
+            structuresBuilder.put(name, structureBuilder.build());
+        }
+
+        return new NBTMapType(CompoundTag.builder()
+                .put("layers", layersBuilder.build())
+                .putString("biome", biome)
+                .put("structures", structuresBuilder.build())
+                .build());
+    }
+
+    private static List<Pair<Integer, String>> getLayersInfoFromString(final String layersString) {
+        final List<Pair<Integer, String>> ret = new ArrayList<>();
+        for (final String part : layersString.split(",")) {
+            final Pair<Integer, String> layer = getLayerInfoFromString(part);
+            if (layer == null) {
+                return Collections.emptyList();
+            }
+            ret.add(layer);
+        }
+        return ret;
     }
 
     private static Pair<Integer, String> getLayerInfoFromString(final String layerString) {
         final String[] split = layerString.split("\\*", 2);
-        int layerCount;
+        final int layerCount;
         if (split.length == 2) {
             try {
                 layerCount = Integer.parseInt(split[0]);
-            } catch (final NumberFormatException ex) {
+            } catch (final NumberFormatException exception) {
                 return null;
             }
         } else {
             layerCount = 1;
         }
-
         final String blockName = split[split.length - 1];
-        return Pair.of(layerCount, blockName);
-    }
-
-    private static List<Pair<Integer, String>> getLayersInfoFromString(final String layersString) {
-        final List<Pair<Integer, String>> ret = new ArrayList<>();
-        final String[] layers = layersString.split(",");
-
-        for (final String layerString : layers) {
-            final Pair<Integer, String> layer = getLayerInfoFromString(layerString);
-            if (layer == null) {
-                return Collections.emptyList();
-            }
-
-            ret.add(layer);
-        }
-
-        return ret;
+        return new Pair<>(layerCount, blockName);
     }
 }

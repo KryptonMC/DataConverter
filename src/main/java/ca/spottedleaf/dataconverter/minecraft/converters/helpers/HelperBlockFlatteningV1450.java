@@ -1,9 +1,9 @@
 package ca.spottedleaf.dataconverter.minecraft.converters.helpers;
 
+import ca.spottedleaf.dataconverter.nbt.SNBTParser;
 import ca.spottedleaf.dataconverter.types.MapType;
 import ca.spottedleaf.dataconverter.types.nbt.NBTMapType;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import net.minecraft.nbt.TagParser;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,7 +45,7 @@ public final class HelperBlockFlatteningV1450 {
 
     public static MapType<String> parseTag(final String blockstate) {
         try {
-            final MapType<String> ret = new NBTMapType(TagParser.parseTag(blockstate.replace('\'', '"')));
+            final MapType<String> ret = new NBTMapType(SNBTParser.parseTag(blockstate.replace('\'', '"')));
 
             synchronized (IDENTITY_ENSURE) {
                 final MapType<String> identity = IDENTITY_ENSURE.putIfAbsent(ret, ret);
@@ -111,7 +111,7 @@ public final class HelperBlockFlatteningV1450 {
         return nbt == null ? "minecraft:air" : nbt.getString("Name");
     }
 
-    protected static MapType<String> getNBTForIdRaw(final int block) {
+    public static MapType<String> getNBTForIdRaw(final int block) {
         return block >= 0 && block < FLATTENED_BY_ID.length ? FLATTENED_BY_ID[block] : null;
     }
 
