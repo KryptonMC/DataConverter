@@ -7,7 +7,7 @@ import ca.spottedleaf.dataconverter.types.json.JsonMapType;
 import ca.spottedleaf.dataconverter.types.nbt.NBTMapType;
 import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
-import net.minecraft.nbt.CompoundTag;
+import org.kryptonmc.nbt.CompoundTag;
 
 public final class MCDataConverter {
 

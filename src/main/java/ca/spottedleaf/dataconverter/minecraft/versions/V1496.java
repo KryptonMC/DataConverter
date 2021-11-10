@@ -7,12 +7,12 @@ import ca.spottedleaf.dataconverter.types.ListType;
 import ca.spottedleaf.dataconverter.types.MapType;
 import ca.spottedleaf.dataconverter.types.ObjectType;
 import ca.spottedleaf.dataconverter.types.Types;
-import com.mojang.datafixers.DataFixUtils;
+import ca.spottedleaf.dataconverter.util.MathUtil;
+import ca.spottedleaf.dataconverter.util.PackedBitStorage;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntIterator;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import net.minecraft.util.datafix.PackedBitStorage;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -241,7 +241,7 @@ public final class V1496 {
                 this.storage = null;
             } else {
                 final long[] states = section.getLongs("BlockStates");
-                final int bits = Math.max(4, DataFixUtils.ceillog2(this.palette.size()));
+                final int bits = Math.max(4, MathUtil.ceillog2(this.palette.size()));
                 this.storage = new PackedBitStorage(bits, 4096, states);
             }
         }

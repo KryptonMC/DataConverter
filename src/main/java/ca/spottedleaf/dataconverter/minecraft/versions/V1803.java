@@ -6,7 +6,8 @@ import ca.spottedleaf.dataconverter.minecraft.datatypes.MCTypeRegistry;
 import ca.spottedleaf.dataconverter.types.ListType;
 import ca.spottedleaf.dataconverter.types.MapType;
 import ca.spottedleaf.dataconverter.types.ObjectType;
-import net.minecraft.network.chat.Component;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 
 public final class V1803 {
 
@@ -36,7 +37,7 @@ public final class V1803 {
                 }
 
                 for (int i = 0, len = lore.size(); i < len; ++i) {
-                    lore.setString(i, Component.Serializer.toJson(Component.literal(lore.getString(i))));
+                    lore.setString(i, GsonComponentSerializer.gson().serialize(Component.text(lore.getString(i))));
                 }
 
                 return null;

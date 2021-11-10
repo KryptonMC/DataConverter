@@ -7,11 +7,7 @@ import ca.spottedleaf.dataconverter.types.ObjectType;
 import ca.spottedleaf.dataconverter.types.ListType;
 import ca.spottedleaf.dataconverter.types.MapType;
 import com.google.gson.JsonParseException;
-import net.minecraft.network.chat.CommonComponents;
-import net.minecraft.network.chat.Component;
-import net.minecraft.util.GsonHelper;
-import net.minecraft.util.datafix.fixes.BlockEntitySignTextStrictJsonFix;
-import org.apache.commons.lang3.StringUtils;
+import net.kyori.adventure.text.Component;
 
 public final class V165 {
 
@@ -33,40 +29,22 @@ public final class V165 {
 
                 for (int i = 0, len = pages.size(); i < len; ++i) {
                     final String page = pages.getString(i);
-                    Component component = null;
-
-                    if (!"null".equals(page) && !StringUtils.isEmpty(page)) {
-                        if (page.charAt(0) == '"' && page.charAt(page.length() - 1) == '"' || page.charAt(0) == '{' && page.charAt(page.length() - 1) == '}') {
+                    Component component;
+                    if (!page.equals("null") && !page.isEmpty()) {
+                        if (page.charAt(0) == '"' && page.charAt(page.length() - 1) == '"'
+                                || page.charAt(0) == '{' && page.charAt(page.length() - 1) == '}') {
                             try {
-                                component = GsonHelper.fromJson(BlockEntitySignTextStrictJsonFix.GSON, page, Component.class, true);
-                                if (component == null) {
-                                    component = CommonComponents.EMPTY;
-                                }
-                            } catch (final JsonParseException ignored) {}
-
-                            if (component == null) {
-                                try {
-                                    component = Component.Serializer.fromJson(page);
-                                } catch (final JsonParseException ignored) {}
-                            }
-
-                            if (component == null) {
-                                try {
-                                    component = Component.Serializer.fromJsonLenient(page);
-                                } catch (JsonParseException ignored) {}
-                            }
-
-                            if (component == null) {
-                                component = Component.literal(page);
+                                component = V101.GSON.fromJson(page, Component.class);
+                            } catch (final JsonParseException exception) {
+                                component = Component.empty();
                             }
                         } else {
-                            component = Component.literal(page);
+                            component = Component.text(page);
                         }
                     } else {
-                        component = CommonComponents.EMPTY;
+                        component = Component.empty();
                     }
-
-                    pages.setString(i, Component.Serializer.toJson(component));
+                    pages.setString(i, V101.GSON.toJson(component));
                 }
 
                 return null;

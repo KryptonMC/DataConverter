@@ -21,18 +21,274 @@ import ca.spottedleaf.dataconverter.types.MapType;
 import ca.spottedleaf.dataconverter.types.ObjectType;
 import ca.spottedleaf.dataconverter.types.Types;
 import com.google.common.base.Splitter;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.datafix.fixes.BlockStateData;
-import net.minecraft.util.datafix.fixes.EntityBlockStateFix;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import net.kyori.adventure.key.InvalidKeyException;
+import net.kyori.adventure.key.Key;
 import org.apache.commons.lang3.math.NumberUtils;
 import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 public final class V1451 {
 
     protected static final int VERSION = MCVersions.V17W47A;
+    private static final Object2IntMap<String> REMAPPED_IDS = new Object2IntOpenHashMap<>();
+    static {
+        REMAPPED_IDS.put("minecraft:air", 0);
+        REMAPPED_IDS.put("minecraft:stone", 1);
+        REMAPPED_IDS.put("minecraft:grass", 2);
+        REMAPPED_IDS.put("minecraft:dirt", 3);
+        REMAPPED_IDS.put("minecraft:cobblestone", 4);
+        REMAPPED_IDS.put("minecraft:planks", 5);
+        REMAPPED_IDS.put("minecraft:sapling", 6);
+        REMAPPED_IDS.put("minecraft:bedrock", 7);
+        REMAPPED_IDS.put("minecraft:flowing_water", 8);
+        REMAPPED_IDS.put("minecraft:water", 9);
+        REMAPPED_IDS.put("minecraft:flowing_lava", 10);
+        REMAPPED_IDS.put("minecraft:lava", 11);
+        REMAPPED_IDS.put("minecraft:sand", 12);
+        REMAPPED_IDS.put("minecraft:gravel", 13);
+        REMAPPED_IDS.put("minecraft:gold_ore", 14);
+        REMAPPED_IDS.put("minecraft:iron_ore", 15);
+        REMAPPED_IDS.put("minecraft:coal_ore", 16);
+        REMAPPED_IDS.put("minecraft:log", 17);
+        REMAPPED_IDS.put("minecraft:leaves", 18);
+        REMAPPED_IDS.put("minecraft:sponge", 19);
+        REMAPPED_IDS.put("minecraft:glass", 20);
+        REMAPPED_IDS.put("minecraft:lapis_ore", 21);
+        REMAPPED_IDS.put("minecraft:lapis_block", 22);
+        REMAPPED_IDS.put("minecraft:dispenser", 23);
+        REMAPPED_IDS.put("minecraft:sandstone", 24);
+        REMAPPED_IDS.put("minecraft:noteblock", 25);
+        REMAPPED_IDS.put("minecraft:bed", 26);
+        REMAPPED_IDS.put("minecraft:golden_rail", 27);
+        REMAPPED_IDS.put("minecraft:detector_rail", 28);
+        REMAPPED_IDS.put("minecraft:sticky_piston", 29);
+        REMAPPED_IDS.put("minecraft:web", 30);
+        REMAPPED_IDS.put("minecraft:tallgrass", 31);
+        REMAPPED_IDS.put("minecraft:deadbush", 32);
+        REMAPPED_IDS.put("minecraft:piston", 33);
+        REMAPPED_IDS.put("minecraft:piston_head", 34);
+        REMAPPED_IDS.put("minecraft:wool", 35);
+        REMAPPED_IDS.put("minecraft:piston_extension", 36);
+        REMAPPED_IDS.put("minecraft:yellow_flower", 37);
+        REMAPPED_IDS.put("minecraft:red_flower", 38);
+        REMAPPED_IDS.put("minecraft:brown_mushroom", 39);
+        REMAPPED_IDS.put("minecraft:red_mushroom", 40);
+        REMAPPED_IDS.put("minecraft:gold_block", 41);
+        REMAPPED_IDS.put("minecraft:iron_block", 42);
+        REMAPPED_IDS.put("minecraft:double_stone_slab", 43);
+        REMAPPED_IDS.put("minecraft:stone_slab", 44);
+        REMAPPED_IDS.put("minecraft:brick_block", 45);
+        REMAPPED_IDS.put("minecraft:tnt", 46);
+        REMAPPED_IDS.put("minecraft:bookshelf", 47);
+        REMAPPED_IDS.put("minecraft:mossy_cobblestone", 48);
+        REMAPPED_IDS.put("minecraft:obsidian", 49);
+        REMAPPED_IDS.put("minecraft:torch", 50);
+        REMAPPED_IDS.put("minecraft:fire", 51);
+        REMAPPED_IDS.put("minecraft:mob_spawner", 52);
+        REMAPPED_IDS.put("minecraft:oak_stairs", 53);
+        REMAPPED_IDS.put("minecraft:chest", 54);
+        REMAPPED_IDS.put("minecraft:redstone_wire", 55);
+        REMAPPED_IDS.put("minecraft:diamond_ore", 56);
+        REMAPPED_IDS.put("minecraft:diamond_block", 57);
+        REMAPPED_IDS.put("minecraft:crafting_table", 58);
+        REMAPPED_IDS.put("minecraft:wheat", 59);
+        REMAPPED_IDS.put("minecraft:farmland", 60);
+        REMAPPED_IDS.put("minecraft:furnace", 61);
+        REMAPPED_IDS.put("minecraft:lit_furnace", 62);
+        REMAPPED_IDS.put("minecraft:standing_sign", 63);
+        REMAPPED_IDS.put("minecraft:wooden_door", 64);
+        REMAPPED_IDS.put("minecraft:ladder", 65);
+        REMAPPED_IDS.put("minecraft:rail", 66);
+        REMAPPED_IDS.put("minecraft:stone_stairs", 67);
+        REMAPPED_IDS.put("minecraft:wall_sign", 68);
+        REMAPPED_IDS.put("minecraft:lever", 69);
+        REMAPPED_IDS.put("minecraft:stone_pressure_plate", 70);
+        REMAPPED_IDS.put("minecraft:iron_door", 71);
+        REMAPPED_IDS.put("minecraft:wooden_pressure_plate", 72);
+        REMAPPED_IDS.put("minecraft:redstone_ore", 73);
+        REMAPPED_IDS.put("minecraft:lit_redstone_ore", 74);
+        REMAPPED_IDS.put("minecraft:unlit_redstone_torch", 75);
+        REMAPPED_IDS.put("minecraft:redstone_torch", 76);
+        REMAPPED_IDS.put("minecraft:stone_button", 77);
+        REMAPPED_IDS.put("minecraft:snow_layer", 78);
+        REMAPPED_IDS.put("minecraft:ice", 79);
+        REMAPPED_IDS.put("minecraft:snow", 80);
+        REMAPPED_IDS.put("minecraft:cactus", 81);
+        REMAPPED_IDS.put("minecraft:clay", 82);
+        REMAPPED_IDS.put("minecraft:reeds", 83);
+        REMAPPED_IDS.put("minecraft:jukebox", 84);
+        REMAPPED_IDS.put("minecraft:fence", 85);
+        REMAPPED_IDS.put("minecraft:pumpkin", 86);
+        REMAPPED_IDS.put("minecraft:netherrack", 87);
+        REMAPPED_IDS.put("minecraft:soul_sand", 88);
+        REMAPPED_IDS.put("minecraft:glowstone", 89);
+        REMAPPED_IDS.put("minecraft:portal", 90);
+        REMAPPED_IDS.put("minecraft:lit_pumpkin", 91);
+        REMAPPED_IDS.put("minecraft:cake", 92);
+        REMAPPED_IDS.put("minecraft:unpowered_repeater", 93);
+        REMAPPED_IDS.put("minecraft:powered_repeater", 94);
+        REMAPPED_IDS.put("minecraft:stained_glass", 95);
+        REMAPPED_IDS.put("minecraft:trapdoor", 96);
+        REMAPPED_IDS.put("minecraft:monster_egg", 97);
+        REMAPPED_IDS.put("minecraft:stonebrick", 98);
+        REMAPPED_IDS.put("minecraft:brown_mushroom_block", 99);
+        REMAPPED_IDS.put("minecraft:red_mushroom_block", 100);
+        REMAPPED_IDS.put("minecraft:iron_bars", 101);
+        REMAPPED_IDS.put("minecraft:glass_pane", 102);
+        REMAPPED_IDS.put("minecraft:melon_block", 103);
+        REMAPPED_IDS.put("minecraft:pumpkin_stem", 104);
+        REMAPPED_IDS.put("minecraft:melon_stem", 105);
+        REMAPPED_IDS.put("minecraft:vine", 106);
+        REMAPPED_IDS.put("minecraft:fence_gate", 107);
+        REMAPPED_IDS.put("minecraft:brick_stairs", 108);
+        REMAPPED_IDS.put("minecraft:stone_brick_stairs", 109);
+        REMAPPED_IDS.put("minecraft:mycelium", 110);
+        REMAPPED_IDS.put("minecraft:waterlily", 111);
+        REMAPPED_IDS.put("minecraft:nether_brick", 112);
+        REMAPPED_IDS.put("minecraft:nether_brick_fence", 113);
+        REMAPPED_IDS.put("minecraft:nether_brick_stairs", 114);
+        REMAPPED_IDS.put("minecraft:nether_wart", 115);
+        REMAPPED_IDS.put("minecraft:enchanting_table", 116);
+        REMAPPED_IDS.put("minecraft:brewing_stand", 117);
+        REMAPPED_IDS.put("minecraft:cauldron", 118);
+        REMAPPED_IDS.put("minecraft:end_portal", 119);
+        REMAPPED_IDS.put("minecraft:end_portal_frame", 120);
+        REMAPPED_IDS.put("minecraft:end_stone", 121);
+        REMAPPED_IDS.put("minecraft:dragon_egg", 122);
+        REMAPPED_IDS.put("minecraft:redstone_lamp", 123);
+        REMAPPED_IDS.put("minecraft:lit_redstone_lamp", 124);
+        REMAPPED_IDS.put("minecraft:double_wooden_slab", 125);
+        REMAPPED_IDS.put("minecraft:wooden_slab", 126);
+        REMAPPED_IDS.put("minecraft:cocoa", 127);
+        REMAPPED_IDS.put("minecraft:sandstone_stairs", 128);
+        REMAPPED_IDS.put("minecraft:emerald_ore", 129);
+        REMAPPED_IDS.put("minecraft:ender_chest", 130);
+        REMAPPED_IDS.put("minecraft:tripwire_hook", 131);
+        REMAPPED_IDS.put("minecraft:tripwire", 132);
+        REMAPPED_IDS.put("minecraft:emerald_block", 133);
+        REMAPPED_IDS.put("minecraft:spruce_stairs", 134);
+        REMAPPED_IDS.put("minecraft:birch_stairs", 135);
+        REMAPPED_IDS.put("minecraft:jungle_stairs", 136);
+        REMAPPED_IDS.put("minecraft:command_block", 137);
+        REMAPPED_IDS.put("minecraft:beacon", 138);
+        REMAPPED_IDS.put("minecraft:cobblestone_wall", 139);
+        REMAPPED_IDS.put("minecraft:flower_pot", 140);
+        REMAPPED_IDS.put("minecraft:carrots", 141);
+        REMAPPED_IDS.put("minecraft:potatoes", 142);
+        REMAPPED_IDS.put("minecraft:wooden_button", 143);
+        REMAPPED_IDS.put("minecraft:skull", 144);
+        REMAPPED_IDS.put("minecraft:anvil", 145);
+        REMAPPED_IDS.put("minecraft:trapped_chest", 146);
+        REMAPPED_IDS.put("minecraft:light_weighted_pressure_plate", 147);
+        REMAPPED_IDS.put("minecraft:heavy_weighted_pressure_plate", 148);
+        REMAPPED_IDS.put("minecraft:unpowered_comparator", 149);
+        REMAPPED_IDS.put("minecraft:powered_comparator", 150);
+        REMAPPED_IDS.put("minecraft:daylight_detector", 151);
+        REMAPPED_IDS.put("minecraft:redstone_block", 152);
+        REMAPPED_IDS.put("minecraft:quartz_ore", 153);
+        REMAPPED_IDS.put("minecraft:hopper", 154);
+        REMAPPED_IDS.put("minecraft:quartz_block", 155);
+        REMAPPED_IDS.put("minecraft:quartz_stairs", 156);
+        REMAPPED_IDS.put("minecraft:activator_rail", 157);
+        REMAPPED_IDS.put("minecraft:dropper", 158);
+        REMAPPED_IDS.put("minecraft:stained_hardened_clay", 159);
+        REMAPPED_IDS.put("minecraft:stained_glass_pane", 160);
+        REMAPPED_IDS.put("minecraft:leaves2", 161);
+        REMAPPED_IDS.put("minecraft:log2", 162);
+        REMAPPED_IDS.put("minecraft:acacia_stairs", 163);
+        REMAPPED_IDS.put("minecraft:dark_oak_stairs", 164);
+        REMAPPED_IDS.put("minecraft:slime", 165);
+        REMAPPED_IDS.put("minecraft:barrier", 166);
+        REMAPPED_IDS.put("minecraft:iron_trapdoor", 167);
+        REMAPPED_IDS.put("minecraft:prismarine", 168);
+        REMAPPED_IDS.put("minecraft:sea_lantern", 169);
+        REMAPPED_IDS.put("minecraft:hay_block", 170);
+        REMAPPED_IDS.put("minecraft:carpet", 171);
+        REMAPPED_IDS.put("minecraft:hardened_clay", 172);
+        REMAPPED_IDS.put("minecraft:coal_block", 173);
+        REMAPPED_IDS.put("minecraft:packed_ice", 174);
+        REMAPPED_IDS.put("minecraft:double_plant", 175);
+        REMAPPED_IDS.put("minecraft:standing_banner", 176);
+        REMAPPED_IDS.put("minecraft:wall_banner", 177);
+        REMAPPED_IDS.put("minecraft:daylight_detector_inverted", 178);
+        REMAPPED_IDS.put("minecraft:red_sandstone", 179);
+        REMAPPED_IDS.put("minecraft:red_sandstone_stairs", 180);
+        REMAPPED_IDS.put("minecraft:double_stone_slab2", 181);
+        REMAPPED_IDS.put("minecraft:stone_slab2", 182);
+        REMAPPED_IDS.put("minecraft:spruce_fence_gate", 183);
+        REMAPPED_IDS.put("minecraft:birch_fence_gate", 184);
+        REMAPPED_IDS.put("minecraft:jungle_fence_gate", 185);
+        REMAPPED_IDS.put("minecraft:dark_oak_fence_gate", 186);
+        REMAPPED_IDS.put("minecraft:acacia_fence_gate", 187);
+        REMAPPED_IDS.put("minecraft:spruce_fence", 188);
+        REMAPPED_IDS.put("minecraft:birch_fence", 189);
+        REMAPPED_IDS.put("minecraft:jungle_fence", 190);
+        REMAPPED_IDS.put("minecraft:dark_oak_fence", 191);
+        REMAPPED_IDS.put("minecraft:acacia_fence", 192);
+        REMAPPED_IDS.put("minecraft:spruce_door", 193);
+        REMAPPED_IDS.put("minecraft:birch_door", 194);
+        REMAPPED_IDS.put("minecraft:jungle_door", 195);
+        REMAPPED_IDS.put("minecraft:acacia_door", 196);
+        REMAPPED_IDS.put("minecraft:dark_oak_door", 197);
+        REMAPPED_IDS.put("minecraft:end_rod", 198);
+        REMAPPED_IDS.put("minecraft:chorus_plant", 199);
+        REMAPPED_IDS.put("minecraft:chorus_flower", 200);
+        REMAPPED_IDS.put("minecraft:purpur_block", 201);
+        REMAPPED_IDS.put("minecraft:purpur_pillar", 202);
+        REMAPPED_IDS.put("minecraft:purpur_stairs", 203);
+        REMAPPED_IDS.put("minecraft:purpur_double_slab", 204);
+        REMAPPED_IDS.put("minecraft:purpur_slab", 205);
+        REMAPPED_IDS.put("minecraft:end_bricks", 206);
+        REMAPPED_IDS.put("minecraft:beetroots", 207);
+        REMAPPED_IDS.put("minecraft:grass_path", 208);
+        REMAPPED_IDS.put("minecraft:end_gateway", 209);
+        REMAPPED_IDS.put("minecraft:repeating_command_block", 210);
+        REMAPPED_IDS.put("minecraft:chain_command_block", 211);
+        REMAPPED_IDS.put("minecraft:frosted_ice", 212);
+        REMAPPED_IDS.put("minecraft:magma", 213);
+        REMAPPED_IDS.put("minecraft:nether_wart_block", 214);
+        REMAPPED_IDS.put("minecraft:red_nether_brick", 215);
+        REMAPPED_IDS.put("minecraft:bone_block", 216);
+        REMAPPED_IDS.put("minecraft:structure_void", 217);
+        REMAPPED_IDS.put("minecraft:observer", 218);
+        REMAPPED_IDS.put("minecraft:white_shulker_box", 219);
+        REMAPPED_IDS.put("minecraft:orange_shulker_box", 220);
+        REMAPPED_IDS.put("minecraft:magenta_shulker_box", 221);
+        REMAPPED_IDS.put("minecraft:light_blue_shulker_box", 222);
+        REMAPPED_IDS.put("minecraft:yellow_shulker_box", 223);
+        REMAPPED_IDS.put("minecraft:lime_shulker_box", 224);
+        REMAPPED_IDS.put("minecraft:pink_shulker_box", 225);
+        REMAPPED_IDS.put("minecraft:gray_shulker_box", 226);
+        REMAPPED_IDS.put("minecraft:silver_shulker_box", 227);
+        REMAPPED_IDS.put("minecraft:cyan_shulker_box", 228);
+        REMAPPED_IDS.put("minecraft:purple_shulker_box", 229);
+        REMAPPED_IDS.put("minecraft:blue_shulker_box", 230);
+        REMAPPED_IDS.put("minecraft:brown_shulker_box", 231);
+        REMAPPED_IDS.put("minecraft:green_shulker_box", 232);
+        REMAPPED_IDS.put("minecraft:red_shulker_box", 233);
+        REMAPPED_IDS.put("minecraft:black_shulker_box", 234);
+        REMAPPED_IDS.put("minecraft:white_glazed_terracotta", 235);
+        REMAPPED_IDS.put("minecraft:orange_glazed_terracotta", 236);
+        REMAPPED_IDS.put("minecraft:magenta_glazed_terracotta", 237);
+        REMAPPED_IDS.put("minecraft:light_blue_glazed_terracotta", 238);
+        REMAPPED_IDS.put("minecraft:yellow_glazed_terracotta", 239);
+        REMAPPED_IDS.put("minecraft:lime_glazed_terracotta", 240);
+        REMAPPED_IDS.put("minecraft:pink_glazed_terracotta", 241);
+        REMAPPED_IDS.put("minecraft:gray_glazed_terracotta", 242);
+        REMAPPED_IDS.put("minecraft:silver_glazed_terracotta", 243);
+        REMAPPED_IDS.put("minecraft:cyan_glazed_terracotta", 244);
+        REMAPPED_IDS.put("minecraft:purple_glazed_terracotta", 245);
+        REMAPPED_IDS.put("minecraft:blue_glazed_terracotta", 246);
+        REMAPPED_IDS.put("minecraft:brown_glazed_terracotta", 247);
+        REMAPPED_IDS.put("minecraft:green_glazed_terracotta", 248);
+        REMAPPED_IDS.put("minecraft:red_glazed_terracotta", 249);
+        REMAPPED_IDS.put("minecraft:black_glazed_terracotta", 250);
+        REMAPPED_IDS.put("minecraft:concrete", 251);
+        REMAPPED_IDS.put("minecraft:concrete_powder", 252);
+        REMAPPED_IDS.put("minecraft:structure_block", 255);
+    }
 
     public static void register() {
         // V0
@@ -181,78 +437,58 @@ public final class V1451 {
             }
         });
         MCTypeRegistry.LEVEL.addStructureConverter(new DataConverter<>(VERSION, 5) {
-            private final Splitter SPLITTER = Splitter.on(';').limit(5);
-            private final Splitter LAYER_SPLITTER = Splitter.on(',');
-            private final Splitter OLD_AMOUNT_SPLITTER = Splitter.on('x').limit(2);
-            private final Splitter AMOUNT_SPLITTER = Splitter.on('*').limit(2);
-            private final Splitter BLOCK_SPLITTER = Splitter.on(':').limit(3);
 
-            // idk man i just copy and pasted this one
-            private String fixGeneratorSettings(final String generatorSettings) {
-                if (generatorSettings.isEmpty()) {
-                    return "minecraft:bedrock,2*minecraft:dirt,minecraft:grass_block;1;village";
-                } else {
-                    Iterator<String> iterator = SPLITTER.split(generatorSettings).iterator();
-                    String string2 = (String)iterator.next();
-                    int j;
-                    String string4;
-                    if (iterator.hasNext()) {
-                        j = NumberUtils.toInt(string2, 0);
-                        string4 = (String)iterator.next();
-                    } else {
-                        j = 0;
-                        string4 = string2;
-                    }
+            private static final Splitter SPLITTER = Splitter.on(';').limit(5);
+            private static final Splitter LAYER_SPLITTER = Splitter.on(',');
+            private static final Splitter OLD_AMOUNT_SPLITTER = Splitter.on('x').limit(2);
+            private static final Splitter AMOUNT_SPLITTER = Splitter.on('*').limit(2);
+            private static final Splitter BLOCK_SPLITTER = Splitter.on(':').limit(3);
 
-                    if (j >= 0 && j <= 3) {
-                        StringBuilder stringBuilder = new StringBuilder();
-                        Splitter splitter = j < 3 ? OLD_AMOUNT_SPLITTER : AMOUNT_SPLITTER;
-                        stringBuilder.append((String) StreamSupport.stream(LAYER_SPLITTER.split(string4).spliterator(), false).map((stringx) -> {
-                            List<String> list = splitter.splitToList(stringx);
-                            int k;
-                            String string3;
-                            if (list.size() == 2) {
-                                k = NumberUtils.toInt((String)list.get(0));
-                                string3 = (String)list.get(1);
-                            } else {
-                                k = 1;
-                                string3 = (String)list.get(0);
-                            }
-
-                            List<String> list2 = BLOCK_SPLITTER.splitToList(string3);
-                            int l = ((String)list2.get(0)).equals("minecraft") ? 1 : 0;
-                            String string5 = (String)list2.get(l);
-                            int m = j == 3 ? EntityBlockStateFix.getBlockId("minecraft:" + string5) : NumberUtils.toInt(string5, 0);
-                            int n = l + 1;
-                            int o = list2.size() > n ? NumberUtils.toInt((String)list2.get(n), 0) : 0;
-                            return (k == 1 ? "" : k + "*") + BlockStateData.getTag(m << 4 | o).get("Name").asString("");
-                        }).collect(Collectors.joining(",")));
-
-                        while(iterator.hasNext()) {
-                            stringBuilder.append(';').append((String)iterator.next());
-                        }
-
-                        return stringBuilder.toString();
-                    } else {
-                        return "minecraft:bedrock,2*minecraft:dirt,minecraft:grass_block;1;village";
-                    }
-                }
+            public MapType<String> convert(final MapType<String> data, final long sourceVersion, final long toVersion) {
+                if (!data.getString("generatorName").equals("flat")) return null;
+                final String generatorOptions = data.getString("generatorOptions");
+                if (generatorOptions == null) return null;
+                data.setString("generatorOptions", fixGeneratorSettings(generatorOptions));
+                return null;
             }
 
-            @Override
-            public MapType<String> convert(final MapType<String> data, final long sourceVersion, final long toVersion) {
-                if (!"flat".equalsIgnoreCase(data.getString("generatorName"))) {
-                    return null;
+            // I rewrote this for my DFU fixes port, so this is what I'm using here
+            private static String fixGeneratorSettings(final String generatorOptions) {
+                if (generatorOptions.isEmpty()) {
+                    return "minecraft:bedrock,2*minecraft:dirt,minecraft:grass_block;1;village";
                 }
+                final Iterator<String> iterator = SPLITTER.split(generatorOptions).iterator();
+                final String first = iterator.next();
+                final int version = iterator.hasNext() ? NumberUtils.toInt(first, 0) : 0;
+                final String next = iterator.hasNext() ? iterator.next() : first;
 
-                final String generatorOptions = data.getString("generatorOptions");
-                if (generatorOptions == null) {
-                    return null;
+                if (version < 0 || version > 3) {
+                    return "minecraft:bedrock,2*minecraft:dirt,minecraft:grass_block;1;village";
                 }
+                final StringBuilder builder = new StringBuilder();
+                final Splitter splitter = version < 3 ? OLD_AMOUNT_SPLITTER : AMOUNT_SPLITTER;
 
-                data.setString("generatorOptions", this.fixGeneratorSettings(generatorOptions));
-
-                return null;
+                builder.append(LAYER_SPLITTER.splitToList(next).stream().map(element -> {
+                    final List<String> amounts = splitter.splitToList(element);
+                    final int amount = amounts.size() == 2 ? NumberUtils.toInt(amounts.get(0), 0) : 1;
+                    final String blocksString = amounts.size() == 2 ? amounts.get(1) : amounts.get(0);
+                    final List<String> blocks = BLOCK_SPLITTER.splitToList(blocksString);
+                    final int index = blocks.get(0).equals("minecraft") ? 1 : 0;
+                    final String block = blocks.get(index);
+                    final int blockId = getBlockId(block);
+                    final int nextIndex = index + 1;
+                    int id;
+                    try {
+                        id = NumberUtils.toInt(blocks.get(nextIndex), 0);
+                    } catch (final ArrayIndexOutOfBoundsException exception) {
+                        id = 0;
+                    }
+                    final String prefix = amount == 1 ? "" : amount + "*";
+                    final MapType<String> nbt = HelperBlockFlatteningV1450.getNBTForIdRaw(blockId >> 4 | id);
+                    return prefix + nbt.getString("Name", "");
+                }));
+                while (iterator.hasNext()) builder.append(";").append(iterator.next());
+                return builder.toString();
             }
         });
 
@@ -305,8 +541,13 @@ public final class V1451 {
 
         MCTypeRegistry.OBJECTIVE.addStructureHook(VERSION, 6, new DataHook<>() {
             private static String packWithDot(final String string) {
-                final ResourceLocation resourceLocation = ResourceLocation.tryParse(string);
-                return resourceLocation != null ? resourceLocation.getNamespace() + "." + resourceLocation.getPath() : string;
+                Key key;
+                try {
+                    key = Key.key(string);
+                } catch (final InvalidKeyException exception) {
+                    key = null;
+                }
+                return key != null ? key.namespace() + "." + key.value() : string;
             }
 
             @Override
@@ -323,8 +564,8 @@ public final class V1451 {
                         id = criteriaName;
                     } else {
                         try {
-                            type = ResourceLocation.of(criteriaName.substring(0, index), '.').toString();
-                            id = ResourceLocation.of(criteriaName.substring(index + 1), '.').toString();
+                            type = Key.key(criteriaName.substring(0, index), '.').asString();
+                            id = Key.key(criteriaName.substring(index + 1), '.').asString();
                         } catch (final Exception ex) {
                             type = "_special";
                             id = criteriaName;
@@ -506,6 +747,10 @@ public final class V1451 {
 
             return null;
         });
+    }
+
+    private static int getBlockId(final String block) {
+        return REMAPPED_IDS.getOrDefault(block, 0);
     }
 
     private V1451() {}

@@ -4,8 +4,8 @@ import ca.spottedleaf.dataconverter.converters.DataConverter;
 import ca.spottedleaf.dataconverter.minecraft.MCVersions;
 import ca.spottedleaf.dataconverter.minecraft.datatypes.MCTypeRegistry;
 import ca.spottedleaf.dataconverter.types.MapType;
-import net.minecraft.network.chat.Component;
-import net.minecraft.world.scores.criteria.ObjectiveCriteria;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 
 public final class V1514 {
 
@@ -22,7 +22,7 @@ public final class V1514 {
                     return null;
                 }
 
-                final String update = Component.Serializer.toJson(Component.literal(displayName));
+                final String update = GsonComponentSerializer.gson().serialize(Component.text(displayName));
 
                 data.setString("DisplayName", update);
 
@@ -38,7 +38,7 @@ public final class V1514 {
                     return null;
                 }
 
-                final String update = Component.Serializer.toJson(Component.literal(displayName));
+                final String update = GsonComponentSerializer.gson().serialize(Component.text(displayName));
 
                 data.setString("DisplayName", update);
 
@@ -47,9 +47,6 @@ public final class V1514 {
         });
 
         MCTypeRegistry.OBJECTIVE.addStructureConverter(new DataConverter<>(VERSION) {
-            private static ObjectiveCriteria.RenderType getRenderType(String string) {
-                return string.equals("health") ? ObjectiveCriteria.RenderType.HEARTS : ObjectiveCriteria.RenderType.INTEGER;
-            }
 
             @Override
             public MapType<String> convert(final MapType<String> data, final long sourceVersion, final long toVersion) {
@@ -60,7 +57,7 @@ public final class V1514 {
 
                 final String criteriaName = data.getString("CriteriaName", "");
 
-                data.setString("RenderType", getRenderType(criteriaName).getId());
+                data.setString("RenderType", criteriaName);
 
                 return null;
             }

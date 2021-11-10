@@ -6,13 +6,13 @@ import ca.spottedleaf.dataconverter.minecraft.datatypes.MCTypeRegistry;
 import ca.spottedleaf.dataconverter.types.ListType;
 import ca.spottedleaf.dataconverter.types.MapType;
 import ca.spottedleaf.dataconverter.types.ObjectType;
+import ca.spottedleaf.dataconverter.util.Pair;
 import com.google.common.collect.ImmutableMap;
-import com.mojang.datafixers.util.Pair;
 
 public final class V1492 {
 
     private static final ImmutableMap<String, Pair<String, ImmutableMap<String, String>>> RENAMES = ImmutableMap.<String, Pair<String, ImmutableMap<String, String>>>builder()
-            .put("EndCity", Pair.of(
+            .put("EndCity", new Pair<>(
                     "ECP",
                     ImmutableMap.<String, String>builder()
                             .put("second_floor", "second_floor_1")
@@ -22,7 +22,7 @@ public final class V1492 {
                     )
             )
 
-            .put("Mansion", Pair.of(
+            .put("Mansion", new Pair<>(
                     "WMP",
                     ImmutableMap.<String, String>builder()
                             .put("carpet_south", "carpet_south_1")
@@ -33,7 +33,7 @@ public final class V1492 {
                     )
             )
 
-            .put("Igloo", Pair.of(
+            .put("Igloo", new Pair<>(
                     "Iglu",
                     ImmutableMap.<String, String>builder()
                             .put("minecraft:igloo/igloo_bottom", "minecraft:igloo/bottom")
@@ -42,7 +42,7 @@ public final class V1492 {
                             .build()
                     )
             )
-            .put("Ocean_Ruin", Pair.of(
+            .put("Ocean_Ruin", new Pair<>(
                     "ORP",
                     ImmutableMap.<String, String>builder()
                             .put("minecraft:ruin/big_ruin1_brick", "minecraft:underwater_ruin/big_brick_1")
@@ -136,9 +136,9 @@ public final class V1492 {
                 for (int i = 0, len = children.size(); i < len; ++i) {
                     final MapType<String> child = children.getMap(i);
 
-                    if (renames.getFirst().equals(child.getString("id"))) {
+                    if (renames.first().equals(child.getString("id"))) {
                         final String template = child.getString("Template", "");
-                        child.setString("Template", renames.getSecond().getOrDefault(template, template));
+                        child.setString("Template", renames.second().getOrDefault(template, template));
                     }
                 }
 
