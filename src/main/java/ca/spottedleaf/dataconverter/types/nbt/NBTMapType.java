@@ -60,7 +60,7 @@ public final class NBTMapType implements MapType<String> {
 
     @Override
     public int size() {
-        return this.map.size();
+        return this.map.getSize();
     }
 
     @Override
@@ -70,12 +70,12 @@ public final class NBTMapType implements MapType<String> {
 
     @Override
     public void clear() {
-        this.map.clear();
+        this.map.getTags().clear();
     }
 
     @Override
     public Set<String> keys() {
-        return this.map.keySet();
+        return this.map.getKeys();
     }
 
     public CompoundTag getTag() {
@@ -84,7 +84,7 @@ public final class NBTMapType implements MapType<String> {
 
     @Override
     public MapType<String> copy() {
-        return new NBTMapType((CompoundTag) this.map.copy());
+        return new NBTMapType(this.map.copy());
     }
 
     @Override

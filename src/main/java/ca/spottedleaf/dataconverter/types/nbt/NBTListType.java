@@ -112,12 +112,12 @@ public final class NBTListType implements ListType {
 
     @Override
     public int size() {
-        return this.list.size();
+        return this.list.getSize();
     }
 
     @Override
     public void remove(final int index) {
-        this.list.remove(index);
+        this.list.removeAt(index);
     }
 
     @Override
@@ -315,7 +315,7 @@ public final class NBTListType implements ListType {
 
     @Override
     public void addByte(final int index, final byte b) {
-        this.list.add(index, ByteTag.of(b));
+        this.list.getData().add(index, ByteTag.of(b));
     }
 
     @Override
@@ -325,7 +325,7 @@ public final class NBTListType implements ListType {
 
     @Override
     public void addShort(final int index, final short s) {
-        this.list.add(index, ShortTag.of(s));
+        this.list.getData().add(index, ShortTag.of(s));
     }
 
     @Override
@@ -335,7 +335,7 @@ public final class NBTListType implements ListType {
 
     @Override
     public void addInt(final int index, final int i) {
-        this.list.add(index, IntTag.of(i));
+        this.list.getData().add(index, IntTag.of(i));
     }
 
     @Override
@@ -345,7 +345,7 @@ public final class NBTListType implements ListType {
 
     @Override
     public void addLong(final int index, final long l) {
-        this.list.add(index, LongTag.of(l));
+        this.list.getData().add(index, LongTag.of(l));
     }
 
     @Override
@@ -355,7 +355,7 @@ public final class NBTListType implements ListType {
 
     @Override
     public void addFloat(final int index, final float f) {
-        this.list.add(index, FloatTag.of(f));
+        this.list.getData().add(index, FloatTag.of(f));
     }
 
     @Override
@@ -365,7 +365,7 @@ public final class NBTListType implements ListType {
 
     @Override
     public void addDouble(final int index, final double d) {
-        this.list.add(index, DoubleTag.of(d));
+        this.list.getData().add(index, DoubleTag.of(d));
     }
 
     @Override
@@ -375,7 +375,7 @@ public final class NBTListType implements ListType {
 
     @Override
     public void addByteArray(final int index, final byte[] arr) {
-        this.list.add(index, new ByteArrayTag(arr));
+        this.list.getData().add(index, new ByteArrayTag(arr));
     }
 
     @Override
@@ -397,7 +397,7 @@ public final class NBTListType implements ListType {
 
     @Override
     public void addIntArray(final int index, final int[] arr) {
-        this.list.add(index, new IntArrayTag(arr));
+        this.list.getData().add(index, new IntArrayTag(arr));
     }
 
     @Override
@@ -407,7 +407,7 @@ public final class NBTListType implements ListType {
 
     @Override
     public void addLongArray(final int index, final long[] arr) {
-        this.list.add(index, new LongArrayTag(arr));
+        this.list.getData().add(index, new LongArrayTag(arr));
     }
 
     @Override
@@ -417,7 +417,7 @@ public final class NBTListType implements ListType {
 
     @Override
     public void addList(final int index, final ListType list) {
-        this.list.add(index, ((NBTListType)list).getTag());
+        this.list.getData().add(index, ((NBTListType)list).getTag());
     }
 
     @Override
@@ -427,7 +427,7 @@ public final class NBTListType implements ListType {
 
     @Override
     public void addMap(final int index, final MapType<?> map) {
-        this.list.add(index, ((NBTMapType)map).getTag());
+        this.list.getData().add(index, ((NBTMapType)map).getTag());
     }
 
     @Override
@@ -437,6 +437,6 @@ public final class NBTListType implements ListType {
 
     @Override
     public void addString(final int index, final String string) {
-        this.list.add(index, StringTag.of(string));
+        this.list.getData().add(index, StringTag.of(string));
     }
 }
