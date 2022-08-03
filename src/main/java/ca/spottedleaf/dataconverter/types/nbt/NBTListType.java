@@ -112,7 +112,7 @@ public final class NBTListType implements ListType {
 
     @Override
     public int size() {
-        return this.list.getSize();
+        return this.list.size();
     }
 
     @Override
@@ -126,7 +126,7 @@ public final class NBTListType implements ListType {
         if (!(tag instanceof NumberTag)) {
             throw new IllegalStateException();
         }
-        return ((NumberTag)tag).getValue();
+        return ((NumberTag)tag).asNumber();
     }
 
     @Override

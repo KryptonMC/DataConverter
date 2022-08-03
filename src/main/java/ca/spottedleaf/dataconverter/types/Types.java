@@ -11,5 +11,6 @@ public interface Types {
     public static final TypeUtil JSON = new JsonTypeUtil();
 
     // why does this exist
+    // Yeah it doesn't make much sense to me either
     public static final TypeUtil JSON_COMPRESSED = new JsonTypeCompressedUtil();
 }

@@ -142,7 +142,7 @@ public final class SNBTParser {
 
     public CompoundTag readStruct() throws IOException {
         this.expect('{');
-        final CompoundTag.Builder builder = CompoundTag.builder();
+        final CompoundTag.Builder builder = CompoundTag.immutableBuilder();
         this.reader.skipWhitespace();
 
         while(this.reader.canRead() && this.reader.peek() != '}') {
@@ -170,7 +170,7 @@ public final class SNBTParser {
         if (!this.reader.canRead()) {
             throw new IOException("Expected value at " + reader.getCursor());
         } else {
-            final ListTag.Builder builder = ListTag.builder();
+            final ListTag.Builder builder = ListTag.immutableBuilder();
             TagType tagType = null;
 
             while(this.reader.peek() != ']') {

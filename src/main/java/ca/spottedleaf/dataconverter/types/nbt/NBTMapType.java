@@ -60,7 +60,7 @@ public final class NBTMapType implements MapType<String> {
 
     @Override
     public int size() {
-        return this.map.getSize();
+        return this.map.size();
     }
 
     @Override
@@ -70,12 +70,12 @@ public final class NBTMapType implements MapType<String> {
 
     @Override
     public void clear() {
-        this.map.getTags().clear();
+        this.map.getData().clear();
     }
 
     @Override
     public Set<String> keys() {
-        return this.map.getKeys();
+        return this.map.keySet();
     }
 
     public CompoundTag getTag() {
@@ -123,7 +123,7 @@ public final class NBTMapType implements MapType<String> {
             case LONG:
             case FLOAT:
             case DOUBLE:
-                return ((NumberTag)tag).getValue();
+                return ((NumberTag)tag).asNumber();
             case MAP:
                 return new NBTMapType((CompoundTag)tag);
             case LIST:
@@ -151,7 +151,7 @@ public final class NBTMapType implements MapType<String> {
     public Number getNumber(final String key, final Number dfl) {
         final Tag tag = this.map.get(key);
         if (tag instanceof NumberTag) {
-            return ((NumberTag)tag).getValue();
+            return ((NumberTag)tag).asNumber();
         }
         return dfl;
     }

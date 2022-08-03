@@ -161,26 +161,26 @@ public final class V1506 {
             structures.put("village", new HashMap<>());
         }
 
-        final ListTag.Builder layersBuilder = ListTag.builder();
+        final ListTag.Builder layersBuilder = ListTag.immutableBuilder();
         for (final Pair<Integer, String> layer : layers) {
-            final CompoundTag layerTag = CompoundTag.builder()
+            final CompoundTag layerTag = CompoundTag.immutableBuilder()
                     .putInt("height", layer.first())
                     .putString("block", layer.second())
                     .build();
             layersBuilder.add(layerTag);
         }
 
-        final CompoundTag.Builder structuresBuilder = CompoundTag.builder();
+        final CompoundTag.Builder structuresBuilder = CompoundTag.immutableBuilder();
         for (final Map.Entry<String, Map<String, String>> structure : structures.entrySet()) {
             final String name = structure.getKey().toLowerCase(Locale.ROOT);
-            final CompoundTag.Builder structureBuilder = CompoundTag.builder();
+            final CompoundTag.Builder structureBuilder = CompoundTag.immutableBuilder();
             for (final Map.Entry<String, String> entry : structure.getValue().entrySet()) {
                 structureBuilder.putString(entry.getKey(), entry.getValue());
             }
             structuresBuilder.put(name, structureBuilder.build());
         }
 
-        return new NBTMapType(CompoundTag.builder()
+        return new NBTMapType(CompoundTag.immutableBuilder()
                 .put("layers", layersBuilder.build())
                 .putString("biome", biome)
                 .put("structures", structuresBuilder.build())
