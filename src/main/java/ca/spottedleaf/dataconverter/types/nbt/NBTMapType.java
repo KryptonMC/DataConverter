@@ -22,11 +22,11 @@ public final class NBTMapType implements MapType<String> {
     private final CompoundTag map;
 
     public NBTMapType() {
-        this.map = CompoundTag.mutable(new HashMap<>());
+        this.map = MutableCompoundTag.empty();
     }
 
     public NBTMapType(final CompoundTag tag) {
-        this.map = tag instanceof MutableCompoundTag ? tag : tag.mutable();
+        this.map = tag.asMutable();
     }
 
     @Override
@@ -99,7 +99,7 @@ public final class NBTMapType implements MapType<String> {
             return false;
         }
 
-        final ObjectType valueType = NBTListType.getType((byte) tag.getId());
+        final ObjectType valueType = NBTListType.getType((byte) tag.id());
 
         return valueType == type || (type == ObjectType.NUMBER && valueType.isNumber());
     }
@@ -116,7 +116,7 @@ public final class NBTMapType implements MapType<String> {
             return null;
         }
 
-        switch (NBTListType.getType((byte) tag.getId())) {
+        switch (NBTListType.getType((byte) tag.id())) {
             case BYTE:
             case SHORT:
             case INT:
@@ -129,7 +129,7 @@ public final class NBTMapType implements MapType<String> {
             case LIST:
                 return new NBTListType((ListTag)tag);
             case STRING:
-                return ((StringTag)tag).getValue();
+                return ((StringTag)tag).value();
             case BYTE_ARRAY:
                 return ((ByteArrayTag)tag).getData();
             // Note: No short array tag!
@@ -429,7 +429,7 @@ public final class NBTMapType implements MapType<String> {
     public String getString(final String key, final String dfl) {
         final Tag tag = this.map.get(key);
         if (tag instanceof StringTag) {
-            return ((StringTag)tag).getValue();
+            return ((StringTag)tag).value();
         }
         return dfl;
     }

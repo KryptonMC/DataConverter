@@ -2,12 +2,15 @@ package ca.spottedleaf.dataconverter.nbt;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
 import org.kryptonmc.nbt.ByteArrayTag;
 import org.kryptonmc.nbt.ByteTag;
 import org.kryptonmc.nbt.DoubleTag;
 import org.kryptonmc.nbt.FloatTag;
+import org.kryptonmc.nbt.ImmutableCompoundTag;
+import org.kryptonmc.nbt.ImmutableListTag;
 import org.kryptonmc.nbt.IntArrayTag;
 import org.kryptonmc.nbt.IntTag;
 import org.kryptonmc.nbt.ListTag;
@@ -18,7 +21,6 @@ import org.kryptonmc.nbt.ShortTag;
 import org.kryptonmc.nbt.CompoundTag;
 import org.kryptonmc.nbt.StringTag;
 import org.kryptonmc.nbt.Tag;
-import org.kryptonmc.nbt.TagType;
 
 public final class SNBTParser {
     public static final char ELEMENT_SEPARATOR = ',';
@@ -142,7 +144,7 @@ public final class SNBTParser {
 
     public CompoundTag readStruct() throws IOException {
         this.expect('{');
-        final CompoundTag.Builder builder = CompoundTag.immutableBuilder();
+        final CompoundTag.Builder builder = ImmutableCompoundTag.builder();
         this.reader.skipWhitespace();
 
         while(this.reader.canRead() && this.reader.peek() != '}') {
@@ -170,14 +172,14 @@ public final class SNBTParser {
         if (!this.reader.canRead()) {
             throw new IOException("Expected value at " + reader.getCursor());
         } else {
-            final ListTag.Builder builder = ListTag.immutableBuilder();
-            TagType tagType = null;
+            final ListTag.Builder builder = ImmutableListTag.builder();
+            int tagType = -1;
 
             while(this.reader.peek() != ']') {
                 int i = this.reader.getCursor();
                 Tag tag = this.readValue();
-                TagType tagType2 = tag.getType();
-                if (tagType == null) {
+                int tagType2 = tag.id();
+                if (tagType == -1) {
                     tagType = tagType2;
                 } else if (tagType2 != tagType) {
                     this.reader.setCursor(i);
@@ -204,36 +206,37 @@ public final class SNBTParser {
         if (!this.reader.canRead()) {
             throw new IOException("Expected value at " + reader.getCursor());
         } else if (c == 'B') {
-            return new ByteArrayTag(this.readArray(ByteArrayTag.TYPE, ByteTag.TYPE));
+            return ByteArrayTag.of(toByteArray(this.readArray(ByteArrayTag.ID, ByteTag.ID)));
         } else if (c == 'L') {
-            return new LongArrayTag(this.readArray(LongArrayTag.TYPE, LongTag.TYPE));
+            return LongArrayTag.of(toLongArray(this.readArray(LongArrayTag.ID, LongTag.ID)));
         } else if (c == 'I') {
-            return new IntArrayTag(this.readArray(IntArrayTag.TYPE, IntTag.TYPE));
+            return IntArrayTag.of(toIntArray(this.readArray(IntArrayTag.ID, IntTag.ID)));
         } else {
             this.reader.setCursor(i);
             throw new IOException("Invalid array!");
         }
     }
 
-    private <T extends Number> List<T> readArray(TagType tagType, TagType tagType2) throws IOException {
+    @SuppressWarnings("unchecked")
+    private <T extends Number> List<T> readArray(int tagType, int tagType2) throws IOException {
         ArrayList<T> list = new ArrayList<>();
 
         while(true) {
             if (this.reader.peek() != ']') {
                 int i = this.reader.getCursor();
                 Tag tag = this.readValue();
-                TagType tagType3 = tag.getType();
+                int tagType3 = tag.id();
                 if (tagType3 != tagType2) {
                     this.reader.setCursor(i);
                     throw new IOException("Mixed array detected!");
                 }
 
-                if (tagType2 == ByteTag.TYPE) {
-                    list.add((T) Byte.valueOf(((NumberTag)tag).toByte()));
-                } else if (tagType2 == LongTag.TYPE) {
-                    list.add((T) Long.valueOf(((NumberTag)tag).toLong()));
+                if (tagType2 == ByteTag.ID) {
+                    list.add((T) Byte.valueOf(((ByteTag) tag).value()));
+                } else if (tagType2 == LongTag.ID) {
+                    list.add((T) Long.valueOf(((LongTag) tag).value()));
                 } else {
-                    list.add((T) Integer.valueOf(((NumberTag)tag).toInt()));
+                    list.add((T) ((NumberTag) tag).asNumber());
                 }
 
                 if (this.hasElementSeparator()) {
@@ -263,5 +266,32 @@ public final class SNBTParser {
     private void expect(char c) throws IOException {
         this.reader.skipWhitespace();
         this.reader.expect(c);
+    }
+
+    private static byte[] toByteArray(final Collection<Byte> values) {
+        final byte[] result = new byte[values.size()];
+        int index = 0;
+        for (final Number value : values) {
+            result[index++] = value.byteValue();
+        }
+        return result;
+    }
+
+    private static int[] toIntArray(final Collection<Integer> values) {
+        final int[] result = new int[values.size()];
+        int index = 0;
+        for (final Number value : values) {
+            result[index++] = value.intValue();
+        }
+        return result;
+    }
+
+    private static long[] toLongArray(final Collection<Long> values) {
+        final long[] result = new long[values.size()];
+        int index = 0;
+        for (final Number value : values) {
+            result[index++] = value.longValue();
+        }
+        return result;
     }
 }

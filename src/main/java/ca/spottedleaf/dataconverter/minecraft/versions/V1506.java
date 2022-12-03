@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import org.kryptonmc.nbt.CompoundTag;
+import org.kryptonmc.nbt.ImmutableCompoundTag;
+import org.kryptonmc.nbt.ImmutableListTag;
 import org.kryptonmc.nbt.ListTag;
 
 public final class V1506 {
@@ -161,26 +163,26 @@ public final class V1506 {
             structures.put("village", new HashMap<>());
         }
 
-        final ListTag.Builder layersBuilder = ListTag.immutableBuilder();
+        final ListTag.Builder layersBuilder = ImmutableListTag.builder();
         for (final Pair<Integer, String> layer : layers) {
-            final CompoundTag layerTag = CompoundTag.immutableBuilder()
+            final CompoundTag layerTag = ImmutableCompoundTag.builder()
                     .putInt("height", layer.first())
                     .putString("block", layer.second())
                     .build();
             layersBuilder.add(layerTag);
         }
 
-        final CompoundTag.Builder structuresBuilder = CompoundTag.immutableBuilder();
+        final CompoundTag.Builder structuresBuilder = ImmutableCompoundTag.builder();
         for (final Map.Entry<String, Map<String, String>> structure : structures.entrySet()) {
             final String name = structure.getKey().toLowerCase(Locale.ROOT);
-            final CompoundTag.Builder structureBuilder = CompoundTag.immutableBuilder();
+            final CompoundTag.Builder structureBuilder = ImmutableCompoundTag.builder();
             for (final Map.Entry<String, String> entry : structure.getValue().entrySet()) {
                 structureBuilder.putString(entry.getKey(), entry.getValue());
             }
             structuresBuilder.put(name, structureBuilder.build());
         }
 
-        return new NBTMapType(CompoundTag.immutableBuilder()
+        return new NBTMapType(ImmutableCompoundTag.builder()
                 .put("layers", layersBuilder.build())
                 .putString("biome", biome)
                 .put("structures", structuresBuilder.build())

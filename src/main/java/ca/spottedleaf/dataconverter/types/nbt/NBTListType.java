@@ -27,11 +27,11 @@ public final class NBTListType implements ListType {
     private final ListTag list;
 
     public NBTListType() {
-        this.list = ListTag.mutable(new ArrayList<>(), 0);
+        this.list = MutableListTag.empty();
     }
 
     public NBTListType(final ListTag tag) {
-        this.list = tag instanceof MutableListTag ? tag : new MutableListTag(tag.getData(), tag.getElementType());
+        this.list = tag.asMutable();
     }
 
     @Override
@@ -107,7 +107,7 @@ public final class NBTListType implements ListType {
 
     @Override
     public ObjectType getType() {
-        return getType((byte) this.list.getElementType());
+        return getType((byte) this.list.elementType());
     }
 
     @Override
@@ -117,7 +117,7 @@ public final class NBTListType implements ListType {
 
     @Override
     public void remove(final int index) {
-        this.list.removeAt(index);
+        this.list.remove(index);
     }
 
     @Override
@@ -224,7 +224,7 @@ public final class NBTListType implements ListType {
 
     @Override
     public void setBytes(final int index, final byte[] to) {
-        this.list.set(index, new ByteArrayTag(to));
+        this.list.set(index, ByteArrayTag.of(to));
     }
 
     @Override
@@ -249,7 +249,7 @@ public final class NBTListType implements ListType {
 
     @Override
     public void setInts(final int index, final int[] to) {
-        this.list.set(index, new IntArrayTag(to));
+        this.list.set(index, IntArrayTag.of(to));
     }
 
     @Override
@@ -263,7 +263,7 @@ public final class NBTListType implements ListType {
 
     @Override
     public void setLongs(final int index, final long[] to) {
-        this.list.set(index, new LongArrayTag(to));
+        this.list.set(index, LongArrayTag.of(to));
     }
 
     @Override
@@ -300,7 +300,7 @@ public final class NBTListType implements ListType {
         if (!(tag instanceof StringTag)) {
             throw new IllegalStateException();
         }
-        return ((StringTag)tag).getValue();
+        return ((StringTag)tag).value();
     }
 
     @Override
@@ -370,12 +370,12 @@ public final class NBTListType implements ListType {
 
     @Override
     public void addByteArray(final byte[] arr) {
-        this.list.add(new ByteArrayTag(arr));
+        this.list.add(ByteArrayTag.of(arr));
     }
 
     @Override
     public void addByteArray(final int index, final byte[] arr) {
-        this.list.getData().add(index, new ByteArrayTag(arr));
+        this.list.getData().add(index, ByteArrayTag.of(arr));
     }
 
     @Override
@@ -392,22 +392,22 @@ public final class NBTListType implements ListType {
 
     @Override
     public void addIntArray(final int[] arr) {
-        this.list.add(new IntArrayTag(arr));
+        this.list.add(IntArrayTag.of(arr));
     }
 
     @Override
     public void addIntArray(final int index, final int[] arr) {
-        this.list.getData().add(index, new IntArrayTag(arr));
+        this.list.getData().add(index, IntArrayTag.of(arr));
     }
 
     @Override
     public void addLongArray(final long[] arr) {
-        this.list.add(new LongArrayTag(arr));
+        this.list.add(LongArrayTag.of(arr));
     }
 
     @Override
     public void addLongArray(final int index, final long[] arr) {
-        this.list.getData().add(index, new LongArrayTag(arr));
+        this.list.getData().add(index, LongArrayTag.of(arr));
     }
 
     @Override
